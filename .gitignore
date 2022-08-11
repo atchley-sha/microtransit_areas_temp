@@ -1,0 +1,10 @@
+#gitignore
+.Rhistory
+.Rproj.user
+.RData
+*.spl
+*.log
+rosm.cache
+data
+*.DS_Store
+_targets

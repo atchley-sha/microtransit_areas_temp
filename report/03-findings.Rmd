@@ -1,0 +1,55 @@
+Findings
+================================================================================
+
+```{r load_events}
+SLCSouth <- read_events("data/outputEvents/SLCSouth.csv")
+Airport <- read_events("data/outputEvents/SLCSouth_WestCity.csv")
+Jordan <- read_events("data/outputEvents/SLCSouth_WestCity_WestJordan.csv")
+Sandy <- read_events("data/outputEvents/SLCSouth_WestCity_Sandy.csv")
+```
+
+
+We calculated several metrics from the output of our base ("South SL County only") scenario and compared them with data from UTA's report on their pilot program [@UTAevalQ1; @UTAevalQ2; @UTAevalQ3; @UTAevalQ4]. Much of the data in that report, however, is not necessarily representative, due to the COVID-19 pandemic and its onset in late March 2020. We also considered that the data for December was not necessarily valuable: since the service was new, people who would otherwise have used it may not have been accustomed to or even known about it. We therefore decided to use the average of the data from January through March. The comparison is given in Table \@ref(tab:UTAComparison).
+
+```{r UTAComparison}
+comparison <- compare_scenarios(
+  list("South SL County only" = SLCSouth)) %>% 
+  select(1,2,5,6) %>% 
+  add_row("Scenario" = "UTA Report Average Jan--Mar",
+          "Weekday Ridership" = mean(UTAODJM$`Avg wkday ridership`),
+          "Average Wait Time (minutes)" = mean(UTAODJM$`Avg wait time`),
+          "Utilization" = mean(UTAODJM$Utilization))
+
+colnames(comparison)[4] <- "Utilization$^{\\text{a}}$"
+  
+comparison %>% 
+  my_kbl(align = 'lrrr',
+         caption = "Comparison of Actual Pilot Program Data with Simulated Base Scenario") %>% 
+  add_footnote("Utilization is calculated as passengers per hour per vehicle")
+```
+
+It is clear from this comparison that more calibration is required in order to better match the real-world data from the pilot program. There are several ways to adjust parameters and code in BEAM to achieve this calibration, and work is planned to continue on doing exactly that (though that is outside the scope of this report). However, it is encouraging to see that the simulated values are within an order of magnitude of the real-world values.
+
+Additionally, we calculated these and other metrics for our other scenarios, and compared them. These metrics are given in Table \@ref(tab:comparison).
+
+```{r comparison}
+comparison <- compare_scenarios(
+  list(
+    "South SL County only" = SLCSouth,
+    "South SLC with Airport" = Airport,
+    "South SLC/Airport/Sandy" = Sandy,
+    "South SLC/Airport/West Jordan" = Jordan),
+  nVehicles = c(12, 24, 36, 36))
+
+colnames(comparison)[6] <- "Utilization$^{\\text{a}}$"
+  
+comparison %>% 
+  my_kbl(align = 'lrrrrr',
+         caption = "Comparison of Simulated Scenarios",
+         latex_options = c("striped", "repeat_header", "HOLD_position", "scale_down")) %>% 
+  add_footnote("Utilization is calculated as passengers per hour per vehicle")
+```
+
+These results seem to indicate that adding a ridehail zone near the airport would not have much of an effect, but adding a zone in either Sandy or West Jordan would. It's possible that the airport zone was too small to be of much use. Additionally, there is already public transit to the airport, so adding a ridehail service wouldn't necessarily provide much additional benefit. However, the other scenarios present a substantial increase in ridership, as well as percentage of trips involving a ridehail vehicle. Utilization in these scenarios on the other hand doesn't seem to improve; it may be that the fleet size needs to be adjusted to better match the demand.
+
+Overall, these results seem to indicate that additional implementation of ridehail services would see good use, and should be seriously considered by UTA.

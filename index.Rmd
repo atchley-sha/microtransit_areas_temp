@@ -1,0 +1,72 @@
+---
+title: "Simulating Geofenced Microtransit in Salt Lake County"
+author:
+  - name: Hayden Atchley
+    email: satchley@byu.edu
+    affiliation: Brigham Young University
+  - name: Gregory Macfarlane
+    email: gregmacfarlane@byu.edu
+    affiliation: Brigham Young University
+address:
+  - code: Brigham Young University
+    address: Civil and Construction Engineering Department, 430 Engineering Building, Provo, Utah 84602
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: article
+journal: "Findings"
+bibliography: [references.bib]
+csl: apa.csl
+link-citations: yes
+abstract: |
+ A number of regions have begun operating microtransit systems to support first and last mile transit access.  In this paper, we modify the ridehailing request handling algorithm in the BEAM microscopic simulation engine to accomodate geographically resetricted microstransit operations. We then examine the ridership operating characteristics for one existing and three proposed geofenced service regions in Salt Lake County, Utah. We find that the simulation generates realistic ridership statistics and wait times, subject to errors likely to be corrected with more thorough choice model calibration. We also found that expanding microtransit services to Sandy or West Jordan might be effective, but might be less so for the area near SLC International Airport.
+description: "A paper about simulating geofenced microtransit in Salt Lake County"
+layout: "3p, authoryear"
+keywords:
+  - Microtransit,
+  - Passive Data,
+  - Location Choice
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE
+)
+```
+
+```{r load_packages, include=FALSE}
+if(!require(pacman)) install.packages("pacman")
+pacman::p_load(
+  char = as.character(readLines("R/packages.txt"))
+  )
+install_github("atchley-sha/R-packageSHA")
+library(packageSHA)
+```
+
+```{r load_functions, include=FALSE}
+source("R/eventHandler.R", echo = FALSE)
+```
+
+
+<!-- \RaggedRight -->
+
+Question
+================================================================================
+
+In November of 2019, Utah Transit Authority (UTA) began a partnership with Via Transportation, a private mobility company [@UTAreport].
+Under this partnership, UTA has supplemented its fixed-route services with on-demand shuttles hailed through a mobile application.
+So-called “microtransit” offerings of this kind have the potential to efficiently extend UTA services into low-density areas and function as first- and last-mile services for the regular fixed-route rail and bus network.
+The current microtransit service is currently only operating in southern Salt Lake County [@UTAonDemand].
+UTA is interested in examining if there are other areas where similar services can be effectively deployed.
+
+In September 2020, UTA released a report detailing a possible expansion of microtransit services to other areas in Utah following the UTA on Demand pilot program [@UTAreport].
+19 zones were identified between Brigham City and Santaquin as areas that could potentially benefit from microtransit services.
+Ridership was estimated based on number of residents and number of workers employed within each zone, as well as a mode share score that VIA developed based on their internal demand model.
+
+We seek however to provide UTA and the Utah Department of Transportation (UDOT) with a microsimulation model they can use as a template to examine future similar projects.
+We want to know how the results of such a model would compare to those of UTA’s September 2020 report.
+Though UTA's own report made no definitive recommendations regarding expansion of microtransit services, it may be useful in calibrating our simulation.
+We also seek to use our results (possibly in conjunction with those of UTA’s report) to make recommendations to UTA and UDOT regarding expansion of microtransit services.
