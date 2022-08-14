@@ -17,22 +17,26 @@ read_iteration_events <- function(scenario_dir, event_cols, iters, ...){
   for (i in 1:length(iters)){
     iter <- iters[i]
     
-    csvgz_file <- paste0(
-      scenario_dir, "/ITERS/it.", iter, "/", iter, ".events.csv.gz"
-    )
-    csv_file <- paste0(
-      scenario_dir, "/ITERS/it.", iter, "/", iter, ".events.csv"
-    )
+    # csvgz_file <- paste0(
+    #   scenario_dir, "/ITERS/it.", iter, "/", iter, ".events.csv.gz"
+    # )
+    # csv_file <- paste0(
+    #   scenario_dir, "/ITERS/it.", iter, "/", iter, ".events.csv"
+    # )
+    # 
+    # if (file.exists(csv_file)){
+    #   events_file <- data.table::fread(file = csv_file, select = event_cols)
+    # } else if (file.exists(csvgz_file)){
+    #   events_file <- data.table::fread(file = csvgz_file, select = event_cols)
+    # } else{
+    #   events_file <- "No events.csv(.gz) file found for this iteration"
+    # }
     
-    if (file.exists(csv_file)){
-      events_file <- data.table::fread(file = csv_file, select = event_cols)
-    } else if (file.exists(csvgz_file)){
-      events_file <- data.table::fread(file = csvgz_file, select = event_cols)
-    } else{
-      events_file <- "No events.csv(.gz) file found for this iteration"
-    }
+    scenario[[i]] <- data.table::fread(
+      file = paste0(scenario_dir, "/", iter, ".events.csv.gz")
+    )
       
-    scenario[[i]] <- events_file
+    # scenario[[i]] <- events_file
   }
   
   scenario
@@ -53,6 +57,6 @@ read_iteration_events <- function(scenario_dir, event_cols, iters, ...){
 get_if_needed <- function(get_from, save_to){
   if (!file.exists(save_to)){
     download.file(get_from, save_to)
-    gunzip(save_to, overwrite = TRUE, remove = FALSE)
+    archive::archive_extract(save_to)
   }
 }
