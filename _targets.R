@@ -1,14 +1,16 @@
 if(!require(pacman)) install.packages("pacman")
-pacman::p_load(targets, tarchetypes, purrr, qs)
+pacman::p_load(targets, tarchetypes, tidyverse, qs)
 
-tar_option_set(packages = c("tidyverse", "data.table", "R.utils", "archive"),
+tar_option_set(packages = c("tidyverse", "data.table", "R.utils", "archive",
+                            "magrittr"),
                garbage_collection = TRUE,
                memory = "transient",
                format = "qs")
 
 # Source R files
 r_files <- c(
-  "R/data_handlers.R"
+  "R/data_handlers.R",
+  "R/summarize_events.R"
 )
 purrr::map(r_files, source)
 
@@ -48,7 +50,7 @@ data_targets <- tar_plan(
     existing = ""
   ),
   
-  ############################################
+  #### Scenarios ##############################
   
   #Existing scenario
   existing_dir = "data/existing",
@@ -56,17 +58,24 @@ data_targets <- tar_plan(
                                 paste0(existing_dir, ".tar")),
   existing = read_iteration_events(existing_dir, event_cols, iterations,
                                    existing_data),
+  existing_fleet = read_ridehail_fleet(paste0(existing_dir, "/rh_fleet.csv")),
   
   
   #Combine all scenarios
   scenarios = list(
-    existing
+    "existing" = existing
+  ),
+  rh_fleets = list(
+    "existing" = existing_fleet
   ),
   
-  ############################################
+  #### UTA On Demand ##########################
   
   #Get UTA On Demand pilot program info
-  UTAOD <- read_csv("data/UTAODpilotinfo.csv")
+  UTAOD = readr::read_csv("data/UTAODpilotinfo.csv"),
+  
+  #months for which the observed data is good
+  good_months <- c("JAN", "FEB", "MAR")
   
 )
 
@@ -74,9 +83,27 @@ data_targets <- tar_plan(
 
 analysis_targets <- tar_plan(
   
-  total_riders <- map(scenarios,
-                      get_tot_rh_passengers,
-                      veh_type = "micro")
+  #### Ridehail events #######################
+  
+  ridehail_modes = c("ride_hail", "ride_hail_pooled", "ride_hail_transit"),
+  ridehail_events = purrr::map(scenarios,
+                               filter_to_ridehail,
+                               veh_type = "micro",
+                               iters = iterations),
+  total_riders = purrr::map(ridehail_events,
+                            get_tot_rh_passengers,
+                            iters = iterations),
+  rh_trips = purrr::map(scenarios,
+                        get_ridehail_trips,
+                        ridehail_modes,
+                        iters = iterations),
+  utilization = purrr::map2(total_riders, rh_fleets,
+                            get_rh_utilization,
+                            iters = iterations),
+  average_wait_times = purrr::map(scenarios,
+                                 get_avg_rh_wait_time,
+                                 iters = iterations),
+  # ridehail_to_transit = c(number, percent, am, pm)
   
 )
 

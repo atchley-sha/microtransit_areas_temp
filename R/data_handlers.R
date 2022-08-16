@@ -14,33 +14,15 @@ read_iteration_events <- function(scenario_dir, event_cols, iters, ...){
  
   scenario <- list()
   
-  for (i in 1:length(iters)){
-    iter <- iters[i]
+  for (i in iters){
     
-    # csvgz_file <- paste0(
-    #   scenario_dir, "/ITERS/it.", iter, "/", iter, ".events.csv.gz"
-    # )
-    # csv_file <- paste0(
-    #   scenario_dir, "/ITERS/it.", iter, "/", iter, ".events.csv"
-    # )
-    # 
-    # if (file.exists(csv_file)){
-    #   events_file <- data.table::fread(file = csv_file, select = event_cols)
-    # } else if (file.exists(csvgz_file)){
-    #   events_file <- data.table::fread(file = csvgz_file, select = event_cols)
-    # } else{
-    #   events_file <- "No events.csv(.gz) file found for this iteration"
-    # }
+    scenario[[as.character(i)]] <- data.table::fread(
+      file = paste0(scenario_dir, "/", i, ".events.csv.gz")
+    ) %>% {.[order(person, time)]}
     
-    scenario[[i]] <- data.table::fread(
-      file = paste0(scenario_dir, "/", iter, ".events.csv.gz")
-    )
-      
-    # scenario[[i]] <- events_file
   }
   
   scenario
-  
 }
 
 
@@ -50,7 +32,7 @@ read_iteration_events <- function(scenario_dir, event_cols, iters, ...){
 #' @param get_from URI or similar to download from
 #' @param save_to File to save locally
 #' 
-#' @return `TRUE` 
+#' @return nothing 
 #' 
 #' @export
 #' 
@@ -59,4 +41,31 @@ get_if_needed <- function(get_from, save_to){
     download.file(get_from, save_to)
     archive::archive_extract(save_to)
   }
+}
+
+
+
+#' Get and process ridehail fleet
+#' 
+#' @param fleet_file RH fleet file
+#' 
+#' @return RH fleet with extra info
+#' 
+#' @export
+#' 
+read_ridehail_fleet <- function(fleet_file){
+  
+  rh_fleet <- list()
+  
+  rh_fleet[["fleet"]] <- read_csv(fleet_file) %>% 
+    separate(shifts, c(NA, "startTime", "endTime", NA), remove = FALSE) %>% 
+    mutate(startTime = as.integer(startTime),
+           endTime = as.integer(endTime),
+           shiftHours = (endTime - startTime) / 3600)
+  
+  rh_fleet[["fleet_hours"]] <- rh_fleet[["fleet"]] %>% 
+    group_by(fleetId) %>% 
+    summarise(vehicleHours = sum(shiftHours))
+  
+  rh_fleet
 }
