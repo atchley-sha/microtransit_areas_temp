@@ -19,7 +19,7 @@ purrr::map(r_files, source)
 data_targets <- tar_plan(
 
   #BEAM iterations to read in for each scenario
-  iterations = c(11),
+  iterations = c(1),
   
   #Names and types of cols to keep for events files
   event_cols = c(
