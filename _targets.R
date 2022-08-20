@@ -10,7 +10,8 @@ tar_option_set(packages = c("tidyverse", "data.table", "R.utils", "archive",
 # Source R files
 r_files <- c(
   "R/data_handlers.R",
-  "R/summarize_events.R"
+  "R/summarize_events.R",
+  "R/UTAOD_comparison.R"
 )
 purrr::map(r_files, source)
 
@@ -112,6 +113,11 @@ analysis_targets <- tar_plan(
 
 viz_targets <- tar_plan(
   
+  UTA = pivot_uta(UTAOD),
+  
+  existing_comparison = compare_existing(UTA, iterations, total_riders$existing,
+                                         utilization$existing,
+                                         average_wait_times$existing)
 )
 
 
