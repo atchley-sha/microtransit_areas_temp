@@ -127,7 +127,6 @@ render_targets <- tar_plan(
 )
 
 
-
 ########### Run all targets ####################################################
 
 tar_plan(

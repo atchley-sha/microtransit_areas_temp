@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 if(!require(pacman)) install.packages("pacman")
 pacman::p_load(targets)
 
-tar_make("<><><><><>")
+tar_make(existing_comparison)
 ```
 
 
