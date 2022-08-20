@@ -135,7 +135,8 @@ get_avg_rh_wait_time <- function(events, iters){
       , leadTime := lead(time) - time][
         type == "ReserveRideHail" & lead(type) == "PersonEntersVehicle" &
           person == lead(person),
-        leadTime]
+        leadTime] %>%
+      magrittr::divide_by(60)
     
     wait_time[[as.character(i)]][["quantiles"]] <- wait_time[[
       as.character(i)]][["times"]] %>% 
