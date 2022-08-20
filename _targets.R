@@ -72,10 +72,11 @@ data_targets <- tar_plan(
   #### UTA On Demand ##########################
   
   #Get UTA On Demand pilot program info
-  UTAOD = readr::read_csv("data/UTAODpilotinfo.csv"),
+  UTAOD = readr::read_csv("data/UTAODpilotinfo.csv") %>% 
+    filter(Month %in% good_months),
   
   #months for which the observed data is good
-  good_months <- c("JAN", "FEB", "MAR")
+  good_months = c("JAN", "FEB", "MAR")
   
 )
 
