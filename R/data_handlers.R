@@ -17,9 +17,9 @@ read_iteration_events <- function(scenario_dir, event_cols, iters, ...){
   for (i in iters){
     
     scenario[[as.character(i)]] <- data.table::fread(
-      file = paste0(scenario_dir, "/", i, ".events.csv.gz")
-    ) %>% {.[order(person, time)]}
-    
+      file = paste0(scenario_dir, "/", i, ".events.csv.gz"),
+      select = event_cols
+    )
   }
   
   scenario
