@@ -42,7 +42,7 @@ if(!require(pacman)) install.packages("pacman")
 pacman::p_load(
   char = as.character(readLines("R/packages.txt"))
   )
-install_github("atchley-sha/R-packageSHA")
+#install_github("atchley-sha/R-packageSHA")
 library(packageSHA)
 ```
 
