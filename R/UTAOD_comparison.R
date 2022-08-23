@@ -35,7 +35,8 @@ compare_existing <- function(UTA, iters, riders, util, wait){
     col <- as.character(i)
     
     beam_results <- beam_results %>% 
-      add_column(c(riders[[col]], util[[col]], wait[[col]]$quantiles["50%"]))
+      add_column(c(riders[[col]], util[[col]], wait[[col]]$quantiles["50%"]),
+                 .name_repair = "universal")
   }
   
   colnames(beam_results) <- c(" ", as.character(iters))
