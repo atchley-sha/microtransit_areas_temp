@@ -17,11 +17,10 @@ filter_to_ridehail <- function(events, veh_type = "micro", iters){
   for (i in iters){
     rh_events[[as.character(i)]] <- events[[as.character(i)]][
       type == "PathTraversal" & vehicleType == veh_type
-    ][
-      order(person, time),
+    ][order(person, time),
       travelTime := arrivalTime - departureTime
-    ][, avgSpeed := length / travelTime][
-      , passengerHours := numPassengers * travelTime / 3600]
+    ][,avgSpeed := length / travelTime
+    ][,passengerHours := numPassengers * travelTime / 3600]
   }
   
   rh_events
@@ -39,15 +38,15 @@ filter_to_ridehail <- function(events, veh_type = "micro", iters){
 #' @export
 #' 
 get_tot_rh_passengers <- function(rh_events, iters){
-
+  
   tot_passengers <- list()
   
   for (i in iters){
     tot_passengers[[as.character(i)]] <- sum(
       rh_events[[as.character(i)]][,numPassengers]
-      )
+    )
   }
-
+  
   tot_passengers
 }
 
@@ -69,10 +68,10 @@ get_ridehail_trips <- function(events, rh_modes, iters){
   
   for (i in iters){
     
-      trips[[as.character(i)]] <- events[[as.character(i)]][
+    trips[[as.character(i)]] <- events[[as.character(i)]][
       type == "arrival",
       legMode
-      ] %>%
+    ] %>%
       table() %>% 
       {tibble(
         numTripsRH = sum(.[names(.) %in% rh_modes]),
@@ -132,15 +131,16 @@ get_avg_rh_wait_time <- function(arranged_events, iters){
     wait_time[[as.character(i)]] <- list()
     
     wait_time[[as.character(i)]][["times"]] <- events[[as.character(i)]][
-      , leadTime := lead(time) - time][
-        type == "ReserveRideHail" & lead(type) == "PersonEntersVehicle" &
-          person == lead(person),
-        leadTime] %>%
+      ,leadTime := lead(time) - time
+    ][type == "ReserveRideHail" & lead(type) == "PersonEntersVehicle" &
+        person == lead(person),
+      leadTime] %>%
       magrittr::divide_by(60)
     
     wait_time[[as.character(i)]][["quantiles"]] <- wait_time[[
       as.character(i)]][["times"]] %>% 
-      quantile(na.rm = TRUE, probs = c(0, .1, .25, .5, .75, .9, 1))
+      quantile(na.rm = TRUE,
+               probs = c(0, .1, .25, .5, .75, .9, 1))
     
     # wait_time[[as.character(i)]][["plot"]] <- wait_time[[
     #   as.character(i)]][["times"]] %>%

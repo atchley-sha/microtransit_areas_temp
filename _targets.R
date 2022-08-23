@@ -120,8 +120,8 @@ analysis_targets <- tar_plan(
     function(x){
       x[type %in% c(
         "ReserveRideHail",
-        "PersonEntersVehicle")][
-          order(person, time)]
+        "PersonEntersVehicle")
+        ][order(person, time)]
     })
   
 )

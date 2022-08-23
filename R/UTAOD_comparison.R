@@ -25,7 +25,8 @@ pivot_uta <- function(UTAOD){
 
 compare_existing <- function(UTA, iters, riders, util, wait){
   
-  beam_results <- tibble(" " = c("Avg wkday ridership",
+  beam_results <- tibble(
+    " " = c("Avg wkday ridership",
                            "Utilization",
                            "Avg wait time"))
   
