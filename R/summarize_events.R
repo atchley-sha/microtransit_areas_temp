@@ -117,14 +117,14 @@ get_rh_utilization <- function(total_riders, rh_fleet, iters){
 
 #' Calculate average ridehail wait times
 #' 
-#' @param events Events
+#' @param aranged_events Events arranged by person then time
 #' @param iters BEAM iterations picked
 #' 
 #' @return Average rh wait time
 #'
 #' @export
 #' 
-get_avg_rh_wait_time <- function(events, iters){
+get_avg_rh_wait_time <- function(arranged_events, iters){
   
   wait_time <- list()
   
