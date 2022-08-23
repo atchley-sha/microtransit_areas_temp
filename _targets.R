@@ -26,7 +26,7 @@ data_targets <- tar_plan(
   #Names and types of cols to keep for events files
   event_cols = c(
     person = "character",
-    time = "integer",
+    time = "numeric",
     type = "character",
     actType = "character",
     tourPurpose = "character",
