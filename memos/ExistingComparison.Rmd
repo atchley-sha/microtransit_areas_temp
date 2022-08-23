@@ -2,7 +2,14 @@
 title: "Comparison of BEAM \"Existing\" Scenario with Observed Data"
 author: "Hayden Atchley"
 date: "`r Sys.Date()`"
-output: pdf_document
+output:
+  pdf_document
+    # keep_tex: true
+    # includes:
+    #   in_header: "template.tex"
+# documentclass: letter
+# header-includes:
+#   - \usepackage{memo-pln}
 editor_options: 
   chunk_output_type: console
 ---
