@@ -117,12 +117,8 @@ analysis_targets <- tar_plan(
   
   rh_wait_time_events_arranged = purrr::map(
     scenarios,
-    function(x){
-      x[type %in% c(
-        "ReserveRideHail",
-        "PersonEntersVehicle")
-        ][order(person, time)]
-    })
+    get_arranged_rh_wait_time_events,
+    iterations)
   
 )
 

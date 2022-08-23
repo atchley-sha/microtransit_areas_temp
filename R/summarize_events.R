@@ -130,7 +130,7 @@ get_avg_rh_wait_time <- function(arranged_events, iters){
   for (i in iters){
     wait_time[[as.character(i)]] <- list()
     
-    wait_time[[as.character(i)]][["times"]] <- events[[as.character(i)]][
+    wait_time[[as.character(i)]][["times"]] <- arranged_events[[as.character(i)]][
       ,leadTime := lead(time) - time
     ][type == "ReserveRideHail" & lead(type) == "PersonEntersVehicle" &
         person == lead(person),
@@ -148,4 +148,25 @@ get_avg_rh_wait_time <- function(arranged_events, iters){
   }
   
   wait_time
+}
+
+
+
+#' Get events for ridehail wait times and arrange them by person then time
+#' 
+# '@param
+#' 
+#' @export
+#' 
+get_arranged_rh_wait_time_events <- function(events, iters){
+  
+  arranged_events <- list()
+  
+  for (i in iters){
+    arranged_events[[as.character(i)]] <- events[[as.character(i)]][
+      type %in% c("ReserveRideHail", "PersonEntersVehicle")
+    ][order(person, time)]
+  }
+  
+  arranged_events
 }
