@@ -1,0 +1,7 @@
+book_filename: "ExistingComparison"
+delete_merged_file: true
+output_dir: memos
+language:
+  ui:
+    chapter_name: " "
+rmd_files: ["memos/ExistingComparison.Rmd"]

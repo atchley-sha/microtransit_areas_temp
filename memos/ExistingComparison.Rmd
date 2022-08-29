@@ -3,7 +3,8 @@ title: "Comparison of BEAM \"Existing\" Scenario with Observed Data"
 author: "Hayden Atchley"
 date: "`r Sys.Date()`"
 output:
-  pdf_document
+  bookdown::pdf_document2:
+    toc: false
     # keep_tex: true
     # includes:
     #   in_header: "template.tex"
@@ -14,6 +15,8 @@ editor_options:
   chunk_output_type: console
 ---
 
+<!-- render_book(config_file = "memos/_bookdown.yml", output_format = "bookdown::pdf_document2") -->
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
 	echo = FALSE,
@@ -22,28 +25,16 @@ knitr::opts_chunk$set(
 )
 
 if(!require(pacman)) install.packages("pacman")
-pacman::p_load(targets)
+pacman::p_load(targets, knitr, kableExtra)
 
 tar_make(existing_comparison)
 ```
 
+# Existing Comparison
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r comparison}
+knitr::kable(tar_read(existing_comparison),
+             digits = 1,
+             booktabs = TRUE) %>%
+  add_header_above(c(" ", "UTA On Demand Pilot Info" = 4, "BEAM Iteration (`Existing')" = 3))
 ```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
