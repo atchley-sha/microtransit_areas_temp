@@ -1,6 +1,6 @@
 ############### Functions for summarizing the events files #####################
 
-#' Filter to ridehail
+#' Filter to ridehail path traversal
 #' 
 #' @param events Events file
 #' @param veh_type Type of vehicle for ridehail
@@ -10,7 +10,7 @@
 #' 
 #' @export
 #'
-filter_to_ridehail <- function(events, veh_type = "micro", iters){
+filter_to_ridehail_pt <- function(events, veh_type = "micro", iters){
   
   rh_events <- list()
   
@@ -23,27 +23,30 @@ filter_to_ridehail <- function(events, veh_type = "micro", iters){
     ][,passengerHours := numPassengers * travelTime / 3600]
   }
   
-  rh_events
+  rh_events_pt
 }
 
 
 
 #' Gets total ridehail passengers
 #' 
-#' @param rh_events Events filtered to ridehail
+#' @param events Events
+#' @param veh_type Type of vehicle for ridehail
 #' @param iters BEAM iterations that were picked
 #' 
 #' @return Total rh passengers
 #' 
 #' @export
 #' 
-get_tot_rh_passengers <- function(rh_events, iters){
+get_tot_rh_passengers <- function(events, veh_type = "micro", iters){
   
   tot_passengers <- list()
   
   for (i in iters){
     tot_passengers[[as.character(i)]] <- sum(
-      rh_events[[as.character(i)]][,numPassengers]
+      events[[as.character(i)]][
+        type == "PathTraversal" & vehicleType == veh_type,
+        numPassengers]
     )
   }
   
@@ -118,12 +121,13 @@ get_rh_utilization <- function(total_riders, rh_fleet, iters){
 #' 
 #' @param aranged_events Events arranged by person then time
 #' @param iters BEAM iterations picked
+#' @param rh_veh_name Pattern to match for ridehail vehicle names
 #' 
 #' @return Average rh wait time
 #'
 #' @export
 #' 
-get_avg_rh_wait_time <- function(arranged_events, iters){
+get_avg_rh_wait_time <- function(arranged_events, iters, rh_veh_name = "rideHailVehicle"){
   
   wait_time <- list()
   
@@ -133,7 +137,7 @@ get_avg_rh_wait_time <- function(arranged_events, iters){
     wait_time[[as.character(i)]][["times"]] <- arranged_events[[as.character(i)]][
       ,leadTime := lead(time) - time
     ][type == "ReserveRideHail" & lead(type) == "PersonEntersVehicle" &
-        person == lead(person),
+        person == lead(person) & str_detect(lead(vehicle), rh_veh_name),
       leadTime] %>%
       magrittr::divide_by(60)
     
@@ -154,7 +158,7 @@ get_avg_rh_wait_time <- function(arranged_events, iters){
 
 #' Get events for ridehail wait times and arrange them by person then time
 #' 
-# '@param
+#' @param
 #' 
 #' @export
 #' 

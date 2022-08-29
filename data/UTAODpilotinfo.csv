@@ -1,4 +1,4 @@
-Month,Avg wkday ridership,Utilization,Avg wait time
+Month,Avg wkday ridership,Utilization,Avg wait time (minutes)
 DEC,224,1.33,9
 JAN,334,2,11
 FEB,392,2.31,12

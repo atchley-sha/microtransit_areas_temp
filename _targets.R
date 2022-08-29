@@ -21,7 +21,7 @@ purrr::map(r_files, source)
 data_targets <- tar_plan(
   
   #BEAM iterations to read in for each scenario
-  iterations = c(1),
+  iterations = c(0,6,11),
   
   #Names and types of cols to keep for events files
   event_cols = c(
@@ -76,8 +76,7 @@ data_targets <- tar_plan(
   #### UTA On Demand ##########################
   
   #Get UTA On Demand pilot program info
-  UTAOD = readr::read_csv("data/UTAODpilotinfo.csv") %>% 
-    filter(Month %in% good_months),
+  tar_target(UTAOD, "data/UTAODpilotinfo.csv", format = "file"),
   
   #months for which the observed data is good
   good_months = c("JAN", "FEB", "MAR")
@@ -91,13 +90,13 @@ analysis_targets <- tar_plan(
   #### Ridehail events #######################
   
   ridehail_modes = c("ride_hail", "ride_hail_pooled", "ride_hail_transit"),
-  ridehail_events = purrr::map(
-    scenarios,
-    filter_to_ridehail,
-    veh_type = "micro",
-    iters = iterations),
+  # ridehail_path_traversal = purrr::map(
+  #   scenarios,
+  #   filter_to_ridehail_pt,
+  #   veh_type = "micro",
+  #   iters = iterations),
   total_riders = purrr::map(
-    ridehail_events,
+    scenarios,
     get_tot_rh_passengers,
     iters = iterations),
   rh_trips = purrr::map(
@@ -126,7 +125,9 @@ analysis_targets <- tar_plan(
 
 viz_targets <- tar_plan(
   
-  UTA = pivot_uta(UTAOD),
+  UTA = readr::read_csv(UTAOD) %>% 
+    filter(Month %in% good_months) %>% 
+    pivot_uta(),
   
   existing_comparison = compare_existing(
     UTA, iterations, total_riders$existing,

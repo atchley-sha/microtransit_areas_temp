@@ -10,7 +10,7 @@ pivot_uta <- function(UTAOD){
   
   ridership <- mean(UTAOD$`Avg wkday ridership`)
   util <- mean(UTAOD$Utilization)
-  wait <- mean(UTAOD$`Avg wait time`)
+  wait <- mean(UTAOD$`Avg wait time (minutes)`)
   
   UTAOD %>% 
     pivot_longer(-Month) %>% 
@@ -27,8 +27,8 @@ compare_existing <- function(UTA, iters, riders, util, wait){
   
   beam_results <- tibble(
     " " = c("Avg wkday ridership",
-                           "Utilization",
-                           "Avg wait time"))
+            "Utilization",
+            "Avg wait time (minutes)"))
   
   for(i in iters){
     
