@@ -2,20 +2,19 @@
 
 #' Filter to ridehail path traversal
 #' 
-#' @param events Events file
+#' @param scenarios List of events files
 #' @param veh_type Type of vehicle for ridehail
-#' @param iters BEAM iterations that were picked
 #' 
 #' @return Events filtered to ridehail
 #' 
 #' @export
 #'
-filter_to_ridehail_pt <- function(events, veh_type = "micro", iters){
+filter_to_ridehail_pt <- function(scenarios, veh_type = "micro"){
   
-  rh_events <- list()
+  rh_scenarios_pt <- list()
   
-  for (i in iters){
-    rh_events[[as.character(i)]] <- events[[as.character(i)]][
+  for (i in scenarios){
+    rh_scenarios_pt[[i]] <- scenarios[[i]][
       type == "PathTraversal" & vehicleType == veh_type
     ][order(person, time),
       travelTime := arrivalTime - departureTime
@@ -23,7 +22,7 @@ filter_to_ridehail_pt <- function(events, veh_type = "micro", iters){
     ][,passengerHours := numPassengers * travelTime / 3600]
   }
   
-  rh_events_pt
+  rh_scenarios_pt
 }
 
 

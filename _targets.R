@@ -46,7 +46,7 @@ data_targets <- tar_plan(
   #   C = read_csv(C_fleet),
   #   D = read_csv(D_fleet)
   # ),
-  
+
   #Names and types of cols to keep for events files
   event_cols = c(
     person = "character",
