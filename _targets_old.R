@@ -5,6 +5,7 @@ tar_option_set(
   packages = c(
     "tidyverse", "data.table", "R.utils", "archive", "magrittr"),
   garbage_collection = TRUE,
+  memory = "transient",
   format = "qs")
 
 # Source R files
@@ -19,33 +20,8 @@ purrr::map(r_files, source)
 
 data_targets <- tar_plan(
   
-  tar_target(EX, "data/wfrc_existing_events.csv.gz", format = "file"),
-  tar_target(A, "data/wfrc_A_events.csv.gz", format = "file"),
-  tar_target(B, "data/wfrc_B_events.csv.gz", format = "file"),
-  tar_target(C, "data/wfrc_C_events.csv.gz", format = "file"),
-  tar_target(D, "data/wfrc_D_events.csv.gz", format = "file"),
-  
-  # tar_target(EX_fleet, "data/wfrc_existing_fleet.csv", format = "file"),
-  # tar_target(A_fleet, "data/wfrc_A_fleet.csv", format = "file"),
-  # tar_target(B_fleet, "data/wfrc_B_fleet.csv", format = "file"),
-  # tar_target(C_fleet, "data/wfrc_C_fleet.csv", format = "file"),
-  # tar_target(D_fleet, "data/wfrc_D_fleet.csv", format = "file"),
-  
-  
-  scenarios = list(
-    existing = data.table::fread(file = EX, select = event_cols),
-    A = data.table::fread(file = A, select = event_cols),
-    B = data.table::fread(file = B, select = event_cols),
-    C = data.table::fread(file = C, select = event_cols),
-    D = data.table::fread(file = D, select = event_cols),
-  ),
-  # fleets = list(
-  #   existing = read_csv(EX_fleet),
-  #   A = read_csv(A_fleet),
-  #   B = read_csv(B_fleet),
-  #   C = read_csv(C_fleet),
-  #   D = read_csv(D_fleet)
-  # ),
+  #BEAM iterations to read in for each scenario
+  iterations = c(0,6,11),
   
   #Names and types of cols to keep for events files
   event_cols = c(
@@ -69,6 +45,32 @@ data_targets <- tar_plan(
     linkTravelTime = "character",
     length = "numeric",
     reason = "character"
+  ),
+  
+  #Where to download the scenario data
+  data_locations = c(
+    existing = ""
+  ),
+  
+  #### Scenarios ##############################
+  
+  #Existing scenario
+  existing_dir = "data/existing",
+  existing_data = get_if_needed(
+    data_locations["existing"],
+    paste0(existing_dir, ".tar")),
+  existing = read_iteration_events(
+    existing_dir, event_cols, iterations,
+    existing_data),
+  existing_fleet = read_ridehail_fleet(paste0(existing_dir, "/rh_fleet.csv")),
+  
+  
+  #Combine all scenarios
+  scenarios = list(
+    "existing" = existing
+  ),
+  rh_fleets = list(
+    "existing" = existing_fleet
   ),
   
   #### UTA On Demand ##########################
