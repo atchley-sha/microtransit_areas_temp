@@ -84,7 +84,7 @@ get_rh_utilization <- function(total_riders, rh_fleet){
   utilization <- total_riders[["avg"]] %>%
     magrittr::divide_by(
       #sum of shift lengths gives total vehicle-hours
-      sum(rh_fleet$shiftHours) / 3600)
+      sum(rh_fleet$shiftHours))
   
   utilization
 }

@@ -25,13 +25,25 @@ compare_riders <- function(riders){
 
 
 
-compare_utilization <- function(util){
+compare_utilization <- function(util, size){
   tibble(Scenario = names(util),
-    Utilization = util)
+    Utilization = util %>% unlist(),
+    "Fleet size" = size)
 }
 
 
 
-comapre_wait_times <- function(wait){
+compare_wait_times <- function(wait){
   
+  comparison <- tibble(names(wait[[1]]$quantiles))
+  
+  for (i in wait){
+    comparison <- comparison %>% 
+      add_column(i$quantiles, .name_repair = "minimal")
+  }
+  
+  colnames(comparison) <- c(
+    "Quantile", names(wait))
+  
+  comparison
 }

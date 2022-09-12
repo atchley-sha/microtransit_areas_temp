@@ -50,6 +50,8 @@ data_targets <- tar_plan(
     C = read_ridehail_fleet(C_fleet),
     D = read_ridehail_fleet(D_fleet)
   ),
+  
+  fleet_sizes = get_fleet_sizes(fleets),
 
 
   #Names and types of cols to keep for events files
@@ -82,7 +84,11 @@ data_targets <- tar_plan(
   tar_target(UTAOD, "data/UTAODpilotinfo.csv", format = "file"),
   
   #months for which the observed data is good
-  good_months = c("JAN", "FEB", "MAR")
+  good_months = c("JAN", "FEB", "MAR"),
+  
+  UTA = readr::read_csv(UTAOD) %>%
+    filter(Month %in% good_months) %>%
+    pivot_uta(),
   
 )
 
@@ -120,10 +126,6 @@ analysis_targets <- tar_plan(
 
 
 viz_targets <- tar_plan(
-  
-  UTA = readr::read_csv(UTAOD) %>%
-    filter(Month %in% good_months) %>%
-    pivot_uta(),
 
   existing_comparison = compare_existing(
     UTA, total_riders$existing,
@@ -134,10 +136,21 @@ viz_targets <- tar_plan(
     total_riders),
   
   utilization_comparison = compare_utilization(
-    utilization),
+    utilization,
+    fleet_sizes),
   
   wait_time_comparison = compare_wait_times(
-    average_wait_times)
+    average_wait_times),
+  
+  
+  # Combine all comparisons for easy loading/viewing
+  all_comparisons = list(
+    "Existing comparison" = existing_comparison,
+    "Ridership comparison" = ridership_comparison,
+    "Utilization comparison" = utilization_comparison,
+    "Wait time comparison" = wait_time_comparison
+  )
+  
 )
 
 
