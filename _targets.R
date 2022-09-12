@@ -44,12 +44,13 @@ data_targets <- tar_plan(
   ),
   
   fleets = list(
-    existing = read_csv(EX_fleet),
-    A = read_csv(A_fleet),
-    B = read_csv(B_fleet),
-    C = read_csv(C_fleet),
-    D = read_csv(D_fleet)
+    existing = read_ridehail_fleet(EX_fleet),
+    A = read_ridehail_fleet(A_fleet),
+    B = read_ridehail_fleet(B_fleet),
+    C = read_ridehail_fleet(C_fleet),
+    D = read_ridehail_fleet(D_fleet)
   ),
+
 
   #Names and types of cols to keep for events files
   event_cols = c(

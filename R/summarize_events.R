@@ -19,16 +19,16 @@ get_tot_rh_passengers <- function(scenario, rh_veh_name = "rideHailVehicle"){
   ] %>% 
     nrow()
   
-   tot_passengers[["leave"]] <- scenario[
-      type == "PersonLeavesVehicle" &
-        str_detect(vehicle, rh_veh_name)
+  tot_passengers[["leave"]] <- scenario[
+    type == "PersonLeavesVehicle" &
+      str_detect(vehicle, rh_veh_name)
   ] %>% 
     nrow()
-   
-   tot_passengers[["avg"]] <- mean(
-     tot_passengers[["enter"]],
-     tot_passengers[["leave"]]
-   )
+  
+  tot_passengers[["avg"]] <- mean(
+    tot_passengers[["enter"]],
+    tot_passengers[["leave"]]
+  )
   
   tot_passengers
 }
@@ -46,18 +46,16 @@ get_tot_rh_passengers <- function(scenario, rh_veh_name = "rideHailVehicle"){
 #' 
 get_ridehail_trips <- function(scenario, rh_modes){
   
-
-    trips <- scenario[
-      type == "arrival",
-      legMode
-    ] %>% 
-      table() %>% 
-      {tibble(
-        numTripsRH = sum(.[names(.) %in% rh_modes]),
-        numTripsTotal = sum(.)
-      )} %>% 
-      mutate(RHTripsFrac = numTripsRH / numTripsTotal)
-
+  trips <- scenario[
+    type == "arrival",
+    legMode
+  ] %>% 
+    table() %>% 
+    {tibble(
+      numTripsRH = sum(.[names(.) %in% rh_modes]),
+      numTripsTotal = sum(.)
+    )} %>% 
+    mutate(RHTripsFrac = numTripsRH / numTripsTotal)
   
   trips
 }
@@ -75,24 +73,6 @@ get_ridehail_trips <- function(scenario, rh_modes){
 
 get_rh_utilization <- function(total_riders, rh_fleet){
   
-  fleet <- rh_fleet %>% 
-    transmute(
-      
-      #This line creates a single-element list containing
-      #a character vector. This code assumes that the format
-      #of the shifts is `{<start>:<end>}`, and so that character
-      #vector is of the form c("", "<start", "<end>", "").
-      #Hence the seemingly arbitrary indices of `shift_split`.
-      shift_split = str_split(shifts, "\\{|:|\\}"),
-      
-      shift_start = shift_split[[1]][2] %>% 
-        as.integer(),
-      shift_end = shift_split[[1]][3] %>% 
-        as.integer(),
-      
-      shift_length = shift_end - shift_start
-    )
-  
   # Utilization as UTA is using the term is 'passengers per
   # vehicle per hour'. So we take the total ridership and
   # divide by the total vehicle-hours of the fleet.
@@ -104,7 +84,7 @@ get_rh_utilization <- function(total_riders, rh_fleet){
   utilization <- total_riders[["avg"]] %>%
     magrittr::divide_by(
       #sum of shift lengths gives total vehicle-hours
-      sum(fleet$shift_length) / 3600)
+      sum(rh_fleet$shiftHours) / 3600)
   
   utilization
 }
@@ -124,7 +104,7 @@ get_avg_rh_wait_time <- function(scenario, rh_veh_name = "rideHailVehicle"){
   
   scenario_arranged <- scenario[
     type %in% c("ReserveRideHail", "PersonEntersVehicle")
-    ][order(person, time)]
+  ][order(person, time)]
   
   wait_time <- list()
   

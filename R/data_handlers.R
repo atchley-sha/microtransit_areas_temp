@@ -55,17 +55,11 @@ get_if_needed <- function(get_from, save_to){
 #' 
 read_ridehail_fleet <- function(fleet_file){
   
-  rh_fleet <- list()
-  
-  rh_fleet[["fleet"]] <- read_csv(fleet_file) %>% 
+  rh_fleet <- read_csv(fleet_file) %>% 
     separate(shifts, c(NA, "startTime", "endTime", NA), remove = FALSE) %>% 
     mutate(startTime = as.integer(startTime),
            endTime = as.integer(endTime),
            shiftHours = (endTime - startTime) / 3600)
-  
-  rh_fleet[["fleet_hours"]] <- rh_fleet[["fleet"]] %>% 
-    group_by(fleetId) %>% 
-    summarise(vehicleHours = sum(shiftHours))
-  
+
   rh_fleet
 }
