@@ -1,5 +1,8 @@
-if(!require(pacman)) install.packages("pacman")
-pacman::p_load(targets, tarchetypes, tidyverse, qs)
+library(targets)
+library(tarchetypes)
+library(readr)
+library(purrr)
+library(qs)
 
 tar_option_set(
   packages = c(
@@ -11,7 +14,8 @@ tar_option_set(
 r_files <- c(
   "R/data_handlers.R",
   "R/summarize_events.R",
-  "R/UTAOD_comparison.R"
+  "R/UTAOD_comparison.R",
+  "R/prelim_comparison.R"
 )
 purrr::map(r_files, source)
 
@@ -20,32 +24,32 @@ purrr::map(r_files, source)
 data_targets <- tar_plan(
   
   tar_target(EX, "data/wfrc_existing_events.csv.gz", format = "file"),
-  tar_target(A, "data/wfrc_A_events.csv.gz", format = "file"),
-  tar_target(B, "data/wfrc_B_events.csv.gz", format = "file"),
-  tar_target(C, "data/wfrc_C_events.csv.gz", format = "file"),
-  tar_target(D, "data/wfrc_D_events.csv.gz", format = "file"),
+  # tar_target(A, "data/wfrc_A_events.csv.gz", format = "file"),
+  # tar_target(B, "data/wfrc_B_events.csv.gz", format = "file"),
+  # tar_target(C, "data/wfrc_C_events.csv.gz", format = "file"),
+  # tar_target(D, "data/wfrc_D_events.csv.gz", format = "file"),
   
-  # tar_target(EX_fleet, "data/wfrc_existing_fleet.csv", format = "file"),
-  # tar_target(A_fleet, "data/wfrc_A_fleet.csv", format = "file"),
-  # tar_target(B_fleet, "data/wfrc_B_fleet.csv", format = "file"),
-  # tar_target(C_fleet, "data/wfrc_C_fleet.csv", format = "file"),
-  # tar_target(D_fleet, "data/wfrc_D_fleet.csv", format = "file"),
-  
+  tar_target(EX_fleet, "data/rh_fleets/rhFleet_Existing.csv", format = "file"),
+  # tar_target(A_fleet, "data/rh_fleets/wfrc_A_fleet.csv", format = "file"),
+  # tar_target(B_fleet, "data/rh_fleets/wfrc_B_fleet.csv", format = "file"),
+  # tar_target(C_fleet, "data/rh_fleets/wfrc_C_fleet.csv", format = "file"),
+  # tar_target(D_fleet, "data/rh_fleets/wfrc_D_fleet.csv", format = "file"),
   
   scenarios = list(
-    existing = data.table::fread(file = EX, select = event_cols),
-    A = data.table::fread(file = A, select = event_cols),
-    B = data.table::fread(file = B, select = event_cols),
-    C = data.table::fread(file = C, select = event_cols),
-    D = data.table::fread(file = D, select = event_cols),
+    existing = data.table::fread(file = EX, select = event_cols)
+    # A = data.table::fread(file = A, select = event_cols),
+    # B = data.table::fread(file = B, select = event_cols),
+    # C = data.table::fread(file = C, select = event_cols),
+    # D = data.table::fread(file = D, select = event_cols),
   ),
-  # fleets = list(
-  #   existing = read_csv(EX_fleet),
-  #   A = read_csv(A_fleet),
-  #   B = read_csv(B_fleet),
-  #   C = read_csv(C_fleet),
-  #   D = read_csv(D_fleet)
-  # ),
+  
+  fleets = list(
+    existing = read_csv(EX_fleet)
+    # A = read_csv(A_fleet),
+    # B = read_csv(B_fleet),
+    # C = read_csv(C_fleet),
+    # D = read_csv(D_fleet)
+  ),
 
   #Names and types of cols to keep for events files
   event_cols = c(
@@ -87,35 +91,28 @@ analysis_targets <- tar_plan(
   
   #### Ridehail events #######################
   
-  ridehail_modes = c("ride_hail", "ride_hail_pooled", "ride_hail_transit"),
-  # ridehail_path_traversal = purrr::map(
-  #   scenarios,
-  #   filter_to_ridehail_pt,
-  #   veh_type = "micro",
-  #   iters = iterations),
+  ridehail_modes = c("ride_hail",
+                     "ride_hail_pooled",
+                     "ride_hail_transit"),
+
   total_riders = purrr::map(
     scenarios,
-    get_tot_rh_passengers,
-    iters = iterations),
+    get_tot_rh_passengers),
+  
   rh_trips = purrr::map(
     scenarios,
     get_ridehail_trips,
-    ridehail_modes,
-    iters = iterations),
-  utilization = purrr::map2(
-    total_riders, rh_fleets,
-    get_rh_utilization,
-    iters = iterations),
-  average_wait_times = purrr::map(
-    rh_wait_time_events_arranged,
-    get_avg_rh_wait_time,
-    iters = iterations),
-  # ridehail_to_transit = c(number, percent, am, pm)
+    ridehail_modes),
   
-  rh_wait_time_events_arranged = purrr::map(
+  utilization = purrr::map2(
+    total_riders, fleets,
+    get_rh_utilization),
+  
+  average_wait_times = purrr::map(
     scenarios,
-    get_arranged_rh_wait_time_events,
-    iterations)
+    get_avg_rh_wait_time),
+  
+  # ridehail_to_transit = c(number, percent, am, pm)
   
 )
 
@@ -123,14 +120,23 @@ analysis_targets <- tar_plan(
 
 viz_targets <- tar_plan(
   
-  UTA = readr::read_csv(UTAOD) %>% 
-    filter(Month %in% good_months) %>% 
+  UTA = readr::read_csv(UTAOD) %>%
+    filter(Month %in% good_months) %>%
     pivot_uta(),
+
+  # existing_comparison = compare_existing(
+  #   UTA, iterations, total_riders$existing,
+  #   utilization$existing,
+  #   average_wait_times$existing)
   
-  existing_comparison = compare_existing(
-    UTA, iterations, total_riders$existing,
-    utilization$existing,
-    average_wait_times$existing)
+  ridership_comparison = compare_riders(
+    total_riders),
+  
+  utilization_comparison = compare_utilization(
+    utilization),
+  
+  wait_time_comparison = compare_wait_times(
+    average_wait_times)
 )
 
 
