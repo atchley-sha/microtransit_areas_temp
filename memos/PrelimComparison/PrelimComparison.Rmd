@@ -1,19 +1,21 @@
 ---
 title: "Preliminary Comparison of BEAM Scenarios"
 author: "Hayden Atchley"
-date: "`r Sys.Date`"
+date: "`r Sys.Date()`"
 output:
   bookdown::pdf_document2:
     toc: false
     # keep_tex: true
     # includes:
     #   in_header: "template.tex"
+    extra_dependencies: ["float"]
 # documentclass: letter
 # header-includes:
-#   - \usepackage{memo-pln}
 editor_options: 
   chunk_output_type: console
 ---
+
+<!-- render_book(config_file = "memos/PrelimComparison/_bookdown.yml", output_format = "bookdown::pdf_document2") -->
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -63,4 +65,14 @@ ggplot() +
   geom_sf(data = SLCSouth, aes(fill = "SLCSouth"), inherit.aes = F, alpha = 0.8) +
   theme_map() +
   scale_fill_manual(name = "Zones", values = colors)
+```
+
+\newpage
+
+# BEAM Results
+
+Here are the preliminary results:
+
+```{r}
+tar_read(all_comparisons)
 ```
