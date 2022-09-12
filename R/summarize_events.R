@@ -24,6 +24,11 @@ get_tot_rh_passengers <- function(scenario, rh_veh_name = "rideHailVehicle"){
         str_detect(vehicle, rh_veh_name)
   ] %>% 
     nrow()
+   
+   tot_passengers[["avg"]] <- mean(
+     tot_passengers[["enter"]],
+     tot_passengers[["leave"]]
+   )
   
   tot_passengers
 }
@@ -96,9 +101,7 @@ get_rh_utilization <- function(total_riders, rh_fleet){
   #vehicle is different (though not hugely), so we take
   #an average. There is probably a better solution.
   
-  utilization <- total_riders[["enter"]] %>%
-    magrittr::add(total_riders[["leave"]]) %>% 
-    magrittr::divide_by(2) %>% 
+  utilization <- total_riders[["avg"]] %>%
     magrittr::divide_by(
       #sum of shift lengths gives total vehicle-hours
       sum(fleet$shift_length) / 3600)

@@ -40,7 +40,7 @@ data_targets <- tar_plan(
     A = data.table::fread(file = A, select = event_cols),
     B = data.table::fread(file = B, select = event_cols),
     C = data.table::fread(file = C, select = event_cols),
-    D = data.table::fread(file = D, select = event_cols),
+    D = data.table::fread(file = D, select = event_cols)
   ),
   
   fleets = list(
@@ -124,10 +124,10 @@ viz_targets <- tar_plan(
     filter(Month %in% good_months) %>%
     pivot_uta(),
 
-  # existing_comparison = compare_existing(
-  #   UTA, iterations, total_riders$existing,
-  #   utilization$existing,
-  #   average_wait_times$existing)
+  existing_comparison = compare_existing(
+    UTA, total_riders$existing,
+    utilization$existing,
+    average_wait_times$existing),
   
   ridership_comparison = compare_riders(
     total_riders),

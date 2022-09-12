@@ -23,25 +23,18 @@ pivot_uta <- function(UTAOD){
 }
 
 
-compare_existing <- function(UTA, iters, riders, util, wait){
+compare_existing <- function(UTA, riders, util, wait){
   
-  beam_results <- tibble(
-    " " = c("Avg wkday ridership",
-            "Utilization",
-            "Avg wait time (minutes)"))
+  comparison <- tibble(
+    c("UTA Observed Data", "BEAM 'Existing' Scenario"),
+    c(UTA$Mean[1], riders$avg),
+    c(UTA$Mean[2], util),
+    c(UTA$Mean[3], wait$quantiles["50%"])
+  )
   
-  for(i in iters){
-    
-    col <- as.character(i)
-    
-    beam_results <- beam_results %>% 
-      add_column(c(riders[[col]], util[[col]], wait[[col]]$quantiles["50%"]),
-                 .name_repair = "universal")
-  }
+  colnames(comparison) <- c(
+    " ", "Ridership", "Utilization", "Avg. wait time (min)")
   
-  colnames(beam_results) <- c(" ", as.character(iters))
-  
-  comparison <- left_join(UTA, beam_results, by = " ")
   comparison
   
 }
