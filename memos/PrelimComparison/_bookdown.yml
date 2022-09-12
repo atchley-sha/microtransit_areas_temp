@@ -1,0 +1,7 @@
+book_filename: "PrelimComparison"
+delete_merged_file: true
+output_dir: memos/PrelimComparison
+language:
+  ui:
+    chapter_name: " "
+rmd_files: ["memos/PrelimComparison/PrelimComparison.Rmd"]

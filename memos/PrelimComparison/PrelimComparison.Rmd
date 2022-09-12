@@ -1,0 +1,66 @@
+---
+title: "Preliminary Comparison of BEAM Scenarios"
+author: "Hayden Atchley"
+date: "`r Sys.Date`"
+output:
+  bookdown::pdf_document2:
+    toc: false
+    # keep_tex: true
+    # includes:
+    #   in_header: "template.tex"
+# documentclass: letter
+# header-includes:
+#   - \usepackage{memo-pln}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE
+)
+
+if(!require(pacman)) install.packages("pacman")
+pacman::p_load(targets, knitr, kableExtra, tidyverse, ggspatial, ggthemes, wesanderson, sf)
+
+tar_make(all_comparisons)
+```
+
+# Intro
+
+UTA ran a pilot program of microtransit, and measured several results:
+
+```{r}
+tar_read(UTA) %>% 
+  kbl(booktabs = TRUE, digits = 2) %>% 
+  kable_styling()
+```
+
+UTA is looking to possibly expand these microtransit services, and we looked at several areas:
+
+
+```{r load_shapefiles}
+SLCSouth <- read_sf("data/Zones/SLCSouth/SLCSouth_polygon.shp") %>% st_transform(crs = 3857)
+Airport <- read_sf("data/Zones/WestCity/WestCity_polygon.shp") %>% st_transform(crs = 3857)
+Sandy <- read_sf("data/Zones/Sandy/Sandy_polygon.shp") %>% st_transform(crs = 3857)
+Jordan <- read_sf("data/Zones/WestJordan/WestJordan_polygon.shp") %>% st_transform(crs = 3857)
+```
+
+```{r map, fig.cap="Ridehail zones in Salt Lake County."}
+pal <- wesanderson::wes_palette("Moonrise2")
+colors <- c("SLCSouth" = pal[1],
+            "Airport" = pal[2],
+            "Sandy" = pal[3],
+            "West Jordan" = pal[4])
+ggplot() + 
+  annotation_map_tile("cartolight", zoom = 12) + 
+  coord_sf(crs = 3857) +
+  geom_sf(data = Airport, aes(fill = "Airport"), inherit.aes = F, alpha = 0.8) +
+  geom_sf(data = Sandy, aes(fill = "Sandy"), inherit.aes = F, alpha = 0.8) +
+  geom_sf(data = Jordan, aes(fill = "West Jordan"), inherit.aes = F, alpha = 0.8) +
+  geom_sf(data = SLCSouth, aes(fill = "SLCSouth"), inherit.aes = F, alpha = 0.8) +
+  theme_map() +
+  scale_fill_manual(name = "Zones", values = colors)
+```

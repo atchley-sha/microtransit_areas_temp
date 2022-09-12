@@ -6,7 +6,7 @@ library(qs)
 
 tar_option_set(
   packages = c(
-    "tidyverse", "data.table", "R.utils", "archive", "magrittr"),
+    "tidyverse", "data.table", "R.utils", "archive", "magrittr", "sf"),
   garbage_collection = TRUE,
   format = "qs")
 

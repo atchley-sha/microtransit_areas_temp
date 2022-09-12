@@ -1,7 +1,7 @@
-book_filename: "ExistingComparison"
+book_filename: "<name>"
 delete_merged_file: true
-output_dir: memos
+output_dir: memos/<dir>
 language:
   ui:
     chapter_name: " "
-rmd_files: ["memos/ExistingComparison.Rmd"]
+rmd_files: ["memos/<dir>/<file>.Rmd"]
