@@ -24,31 +24,31 @@ purrr::map(r_files, source)
 data_targets <- tar_plan(
   
   tar_target(EX, "data/wfrc_existing_events.csv.gz", format = "file"),
-  # tar_target(A, "data/wfrc_A_events.csv.gz", format = "file"),
-  # tar_target(B, "data/wfrc_B_events.csv.gz", format = "file"),
-  # tar_target(C, "data/wfrc_C_events.csv.gz", format = "file"),
-  # tar_target(D, "data/wfrc_D_events.csv.gz", format = "file"),
+  tar_target(A, "data/wfrc_A_events.csv.gz", format = "file"),
+  tar_target(B, "data/wfrc_B_events.csv.gz", format = "file"),
+  tar_target(C, "data/wfrc_C_events.csv.gz", format = "file"),
+  tar_target(D, "data/wfrc_D_events.csv.gz", format = "file"),
   
   tar_target(EX_fleet, "data/rh_fleets/rhFleet_Existing.csv", format = "file"),
-  # tar_target(A_fleet, "data/rh_fleets/wfrc_A_fleet.csv", format = "file"),
-  # tar_target(B_fleet, "data/rh_fleets/wfrc_B_fleet.csv", format = "file"),
-  # tar_target(C_fleet, "data/rh_fleets/wfrc_C_fleet.csv", format = "file"),
-  # tar_target(D_fleet, "data/rh_fleets/wfrc_D_fleet.csv", format = "file"),
+  tar_target(A_fleet, "data/rh_fleets/rhFleet_A.csv", format = "file"),
+  tar_target(B_fleet, "data/rh_fleets/rhFleet_B.csv", format = "file"),
+  tar_target(C_fleet, "data/rh_fleets/rhFleet_C.csv", format = "file"),
+  tar_target(D_fleet, "data/rh_fleets/rhFleet_D.csv", format = "file"),
   
   scenarios = list(
-    existing = data.table::fread(file = EX, select = event_cols)
-    # A = data.table::fread(file = A, select = event_cols),
-    # B = data.table::fread(file = B, select = event_cols),
-    # C = data.table::fread(file = C, select = event_cols),
-    # D = data.table::fread(file = D, select = event_cols),
+    existing = data.table::fread(file = EX, select = event_cols),
+    A = data.table::fread(file = A, select = event_cols),
+    B = data.table::fread(file = B, select = event_cols),
+    C = data.table::fread(file = C, select = event_cols),
+    D = data.table::fread(file = D, select = event_cols),
   ),
   
   fleets = list(
-    existing = read_csv(EX_fleet)
-    # A = read_csv(A_fleet),
-    # B = read_csv(B_fleet),
-    # C = read_csv(C_fleet),
-    # D = read_csv(D_fleet)
+    existing = read_csv(EX_fleet),
+    A = read_csv(A_fleet),
+    B = read_csv(B_fleet),
+    C = read_csv(C_fleet),
+    D = read_csv(D_fleet)
   ),
 
   #Names and types of cols to keep for events files
